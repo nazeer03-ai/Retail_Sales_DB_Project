@@ -1,0 +1,47 @@
+-- Query 1: Sales details with product and client information
+SELECT 
+    p.ProductID,
+    p.ProductName,
+    p.Category,
+    p.Price,
+    c.ClientID,
+    c.FirstName AS ClientFirstName,
+    c.LastName AS ClientLastName,
+    c.Email AS ClientEmail,
+    s.SaleID,
+    s.SaleDate,
+    s.Quantity,
+    s.TotalAmount
+FROM
+    mkt_Sales s
+    JOIN mkt_Products p ON s.ProductID = p.ProductID
+    JOIN mkt_Clients c ON s.ClientID = c.ClientID
+ORDER BY 
+    s.SaleDate;
+
+-- Query 2: Total quantity sold and sales amount for each product
+SELECT 
+    p.ProductID,
+    p.ProductName,
+    SUM(s.Quantity) AS TotalQuantitySold,
+    SUM(s.TotalAmount) AS TotalSalesAmount
+FROM
+    mkt_Sales s
+    JOIN mkt_Products p ON s.ProductID = p.ProductID
+GROUP BY 
+    p.ProductID, p.ProductName
+ORDER BY 
+    TotalSalesAmount DESC;
+
+-- Query 3: Remaining stock for each product
+SELECT 
+    p.ProductID,
+    p.ProductName,
+    p.StockQuantity - COALESCE(SUM(s.Quantity), 0) AS RemainingStock
+FROM
+    mkt_Products p
+    LEFT JOIN mkt_Sales s ON p.ProductID = s.ProductID
+GROUP BY 
+    p.ProductID, p.ProductName, p.StockQuantity
+ORDER BY 
+    p.ProductName;
